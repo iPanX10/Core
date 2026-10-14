@@ -174,16 +174,16 @@
                         </div>
                     </div>
 
+                    
                     <div class="card-footer bg-white border-0 pb-3">
-                        <button
-                            type="button"
+                        <a 
+                            href="{{ route('products.show', $product->slug) }}"
                             class="btn btn-dark w-100"
-                            disabled
-                            title="Fitur keranjang akan dibuat pada tahap berikutnya"
                         >
-                            Segera Hadir
-                        </button>
+                            Lihat Detail
+                        </a>
                     </div>
+
 
                 </div>
             </div>

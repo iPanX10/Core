@@ -34,3 +34,11 @@ Route::get('/', function (Request $request) {
 
     return view('home.index', compact('products', 'categories'));
 })->name('home');
+
+Route::get('/produk/{slug}', function ($slug) {
+    $product = \App\Models\Product::with('category')
+        ->where('slug', $slug)
+        ->firstOrFail();
+
+    return view('products.show', compact('product'));
+})->name('products.show');
