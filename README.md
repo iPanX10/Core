@@ -114,4 +114,6 @@ git push origin fitur-nama-fitur
 ```
 ---
 
+NANTI KLW NGERJAIN DI LOKAL/LAPTOP MASING - MASING AJA YAKK... JGN DI PUSH DI SINI, KLW MAU PUSH DI REPO MASING - MASING AJA
+
 **CORE — Computer Hardware Store**
