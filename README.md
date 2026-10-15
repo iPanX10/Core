@@ -24,7 +24,7 @@ Pastikan perangkat sudah memiliki:
 ### 1. Clone Repository
 
 ```bash
-git clone https://github.com/USERNAME/CORE.git
+git clone https://github.com/Audhril/CORE.git
 ```
 
 ### 2. Masuk ke Direktori Project
