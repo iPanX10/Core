@@ -102,7 +102,6 @@ Buka `http://127.0.0.1:8000` di browser.
 2. Buat branch baru untuk fitur atau perbaikan.
 3. Lakukan perubahan dan pengujian.
 4. Commit perubahan.
-5. Push branch ke GitHub dan ajukan Pull Request jika diperlukan.
 
 Contoh:
 
