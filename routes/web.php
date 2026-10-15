@@ -90,3 +90,49 @@ Route::post('/keranjang/tambah/{id}', function ($id) {
     return redirect()->route('cart.index')
         ->with('success', 'Produk berhasil ditambahkan ke keranjang.');
 })->name('cart.add');
+
+
+ // Mengubah jumlah produk di keranjang
+Route::post('/keranjang/ubah/{id}', function (Request $request, $id) {
+    $product = Product::findOrFail($id);
+
+    $request->validate([
+        'quantity' => 'required|integer|min:1',
+    ]);
+
+    $quantity = (int) $request->quantity;
+
+    if ($quantity > $product->stock) {
+        return back()->with(
+            'error',
+            'Jumlah melebihi stok tersedia: ' . $product->stock
+        );
+    }
+
+    $cart = session('cart', []);
+
+    if (!array_key_exists($id, $cart)) {
+        return back()->with('error', 'Produk tidak ada di keranjang.');
+    }
+
+    $cart[$id] = $quantity;
+    session(['cart' => $cart]);
+
+    return redirect()->route('cart.index')
+        ->with('success', 'Jumlah produk berhasil diperbarui.');
+})->name('cart.update');
+
+// Menghapus produk dari keranjang
+Route::delete('/keranjang/hapus/{id}', function ($id) {
+    $cart = session('cart', []);
+
+    if (!array_key_exists($id, $cart)) {
+        return back()->with('error', 'Produk tidak ada di keranjang.');
+    }
+
+    unset($cart[$id]);
+    session(['cart' => $cart]);
+
+    return redirect()->route('cart.index')
+        ->with('success', 'Produk berhasil dihapus dari keranjang.');
+})->name('cart.remove');

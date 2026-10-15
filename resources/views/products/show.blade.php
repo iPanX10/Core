@@ -62,14 +62,17 @@
             </p>
 
             {{-- KERANJANG SEMENTARA --}}
-            <button
-                type="button"
-                class="btn btn-dark btn-lg w-100 mt-3"
-                disabled
-            >
-                Keranjang — segera hadir
-            </button>
+            <form action="{{ route('cart.add', $product->id) }}" method="POST">
+                @csrf
 
+                <button
+                    type="submit"
+                    class="btn btn-dark btn-lg w-100 mt-3"
+                    {{ $product->stock < 1 ? 'disabled' : '' }}
+                >
+                    {{ $product->stock > 0 ? 'Tambahkan ke Keranjang' : 'Stok Habis' }}
+                </button>
+            </form>
         </div>
     </div>
 </div>
