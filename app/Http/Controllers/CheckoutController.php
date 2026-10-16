@@ -124,6 +124,7 @@ class CheckoutController extends Controller
 
             $order = Order::create([
                 'order_number' => 'CORE-' . Str::upper(Str::random(10)),
+                'access_token' => Str::random(64),
                 'customer_name' => $validated['customer_name'],
                 'whatsapp' => $validated['whatsapp'],
                 'fulfillment_method' => $validated['fulfillment_method'],
@@ -154,16 +155,30 @@ class CheckoutController extends Controller
 
         Session::forget('cart');
 
-        return redirect()->route('checkout.success', $order->order_number);
+        return redirect()->route('checkout.success', [
+            'orderNumber' => $order->order_number,
+            'accessToken' => $order->access_token,
+        ]);
     }
 
     // Menampilkan konfirmasi pesanan
-    public function success(string $orderNumber)
+    public function success(string $orderNumber, string $accessToken)
     {
         $order = Order::with('items')
             ->where('order_number', $orderNumber)
+            ->where('access_token', $accessToken)
             ->firstOrFail();
 
         return view('checkout.success', compact('order'));
+    }
+
+    public function invoice(string $orderNumber, string $accessToken)
+    {
+        $order = \App\Models\Order::with('items')
+            ->where('order_number', $orderNumber)
+            ->where('access_token', $accessToken)
+            ->firstOrFail();
+
+        return view('checkout.invoice', compact('order'));
     }
 }

@@ -5,14 +5,23 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\Order;
 use App\Http\Controllers\CheckoutController;
+
+// ==================================================
+// HALAMAN UTAMA
+// ==================================================
 
 Route::get('/', function (Request $request) {
     $query = Product::with('category');
 
     // Pencarian berdasarkan nama produk
     if ($request->filled('search')) {
-        $query->where('name', 'like', '%' . $request->search . '%');
+        $query->where(
+            'name',
+            'like',
+            '%' . $request->search . '%'
+        );
     }
 
     // Filter berdasarkan kategori
@@ -37,19 +46,29 @@ Route::get('/', function (Request $request) {
     return view('home.index', compact('products', 'categories'));
 })->name('home');
 
+
+// ==================================================
+// DETAIL PRODUK
+// ==================================================
+
 Route::get('/produk/{slug}', function ($slug) {
-    $product = \App\Models\Product::with('category')
+    $product = Product::with('category')
         ->where('slug', $slug)
         ->firstOrFail();
 
     return view('products.show', compact('product'));
 })->name('products.show');
 
+
+// ==================================================
+// KERANJANG BELANJA
+// ==================================================
+
 // Menampilkan isi keranjang
 Route::get('/keranjang', function () {
     $cart = Session::get('cart', []);
 
-    $products = \App\Models\Product::whereIn(
+    $products = Product::whereIn(
         'id',
         array_keys($cart)
     )->get()->keyBy('id');
@@ -58,19 +77,24 @@ Route::get('/keranjang', function () {
 
     foreach ($cart as $productId => $quantity) {
         if (isset($products[$productId])) {
-            $total += $products[$productId]->discount_active
-                && $products[$productId]->discount_percentage > 0
-                ? $products[$productId]->discounted_price * $quantity
-                : $products[$productId]->price * $quantity;
+            $product = $products[$productId];
+
+            $price = $product->discount_active
+                && $product->discount_percentage > 0
+                ? $product->discounted_price
+                : $product->price;
+
+            $total += $price * $quantity;
         }
     }
 
     return view('cart.index', compact('cart', 'products', 'total'));
 })->name('cart.index');
 
+
 // Menambahkan produk ke keranjang
 Route::post('/keranjang/tambah/{id}', function ($id) {
-    $product = \App\Models\Product::findOrFail($id);
+    $product = Product::findOrFail($id);
 
     if ($product->stock < 1) {
         return back()->with('error', 'Produk sedang habis.');
@@ -91,7 +115,7 @@ Route::post('/keranjang/tambah/{id}', function ($id) {
 })->name('cart.add');
 
 
- // Mengubah jumlah produk di keranjang
+// Mengubah jumlah produk di keranjang
 Route::post('/keranjang/ubah/{id}', function (Request $request, $id) {
     $product = Product::findOrFail($id);
 
@@ -121,6 +145,7 @@ Route::post('/keranjang/ubah/{id}', function (Request $request, $id) {
         ->with('success', 'Jumlah produk berhasil diperbarui.');
 })->name('cart.update');
 
+
 // Menghapus produk dari keranjang
 Route::delete('/keranjang/hapus/{id}', function ($id) {
     $cart = session('cart', []);
@@ -136,6 +161,11 @@ Route::delete('/keranjang/hapus/{id}', function ($id) {
         ->with('success', 'Produk berhasil dihapus dari keranjang.');
 })->name('cart.remove');
 
+
+// ==================================================
+// CHECKOUT
+// ==================================================
+
 // Halaman checkout
 Route::get('/checkout', [CheckoutController::class, 'index'])
     ->name('checkout.index');
@@ -144,6 +174,70 @@ Route::get('/checkout', [CheckoutController::class, 'index'])
 Route::post('/checkout', [CheckoutController::class, 'store'])
     ->name('checkout.store');
 
-// Konfirmasi pesanan
-Route::get('/pesanan/{orderNumber}', [CheckoutController::class, 'success'])
-    ->name('checkout.success');
+
+// ==================================================
+// DETAIL DAN PELACAKAN PESANAN
+// ==================================================
+
+// Halaman konfirmasi dan pelacakan pesanan
+Route::get('/pesanan/{orderNumber}/{accessToken}', [
+    CheckoutController::class,
+    'success'
+])->name('checkout.success');
+
+
+// ==================================================
+// INVOICE PESANAN
+// ==================================================
+
+// Halaman invoice pesanan
+Route::get('/pesanan/{orderNumber}/{accessToken}/invoice', [
+    CheckoutController::class,
+    'invoice'
+])->name('checkout.invoice');
+
+
+// ==================================================
+// RIWAYAT PESANAN
+// ==================================================
+
+// Form pencarian riwayat pesanan
+Route::get('/riwayat-pesanan', function () {
+    return view('orders.history');
+})->name('orders.history');
+
+
+// Pencarian pesanan berdasarkan nomor pesanan dan WhatsApp
+Route::post('/riwayat-pesanan', function (Request $request) {
+    $validated = $request->validate([
+        'order_number' => ['required', 'string', 'max:50'],
+        'whatsapp' => ['required', 'string', 'max:20'],
+    ]);
+
+    $order = Order::query()
+        ->with('items')
+        ->where(
+            'order_number',
+            strtoupper(trim($validated['order_number']))
+        )
+        ->where(
+            'whatsapp',
+            trim($validated['whatsapp'])
+        )
+        ->whereNotNull('access_token')
+        ->where('access_token', '!=', '')
+        ->first();
+
+    // Pesanan tidak ditemukan
+    if (! $order) {
+        return back()
+            ->withInput()
+            ->withErrors([
+                'order_number' => 'Pesanan tidak ditemukan. Periksa kembali nomor pesanan dan WhatsApp.',
+            ]);
+    }
+
+    // Menampilkan ringkasan pesanan
+    return view('orders.result', compact('order'));
+
+})->middleware('throttle:5,1')->name('orders.history.search');

@@ -9,6 +9,7 @@ class Order extends Model
 {
     protected $fillable = [
         'order_number',
+        'access_token',
         'customer_name',
         'whatsapp',
         'fulfillment_method',
