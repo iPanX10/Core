@@ -2,8 +2,10 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Session;
 use App\Models\Product;
 use App\Models\Category;
+use App\Http\Controllers\CheckoutController;
 
 Route::get('/', function (Request $request) {
     $query = Product::with('category');
@@ -42,9 +44,6 @@ Route::get('/produk/{slug}', function ($slug) {
 
     return view('products.show', compact('product'));
 })->name('products.show');
-
-
-use Illuminate\Support\Facades\Session;
 
 // Menampilkan isi keranjang
 Route::get('/keranjang', function () {
@@ -136,3 +135,15 @@ Route::delete('/keranjang/hapus/{id}', function ($id) {
     return redirect()->route('cart.index')
         ->with('success', 'Produk berhasil dihapus dari keranjang.');
 })->name('cart.remove');
+
+// Halaman checkout
+Route::get('/checkout', [CheckoutController::class, 'index'])
+    ->name('checkout.index');
+
+// Memproses pesanan
+Route::post('/checkout', [CheckoutController::class, 'store'])
+    ->name('checkout.store');
+
+// Konfirmasi pesanan
+Route::get('/pesanan/{orderNumber}', [CheckoutController::class, 'success'])
+    ->name('checkout.success');

@@ -146,13 +146,10 @@
                             </strong>
                         </div>
 
-                        <button
-                            type="button"
-                            class="btn btn-dark w-100 mt-4"
-                            disabled
-                        >
-                            Checkout — segera hadir
-                        </button>
+                        <a href="{{ route('checkout.index') }}"
+                             class="btn btn-dark btn-lg w-100">
+                                 Lanjut ke Checkout
+                        </a>
                     </div>
                 </div>
             </div>
