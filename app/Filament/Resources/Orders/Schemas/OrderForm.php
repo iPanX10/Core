@@ -29,31 +29,86 @@ class OrderForm
                     ->readOnly(),
 
                 TextInput::make('fulfillment_method')
-                    ->label('Metode Pengambilan')
-                    ->required()
+                    ->label('Metode Penerimaan')
+                    ->formatStateUsing(fn (?string $state): string => match ($state) {
+                        'delivery' => 'Pengiriman',
+                        'pickup' => 'Ambil di Toko',
+                        default => $state ?? '-',
+                    })
                     ->readOnly(),
 
                 Textarea::make('address')
                     ->label('Alamat Pengiriman')
                     ->readOnly()
+                    ->visible(fn ($record): bool =>
+                        $record?->fulfillment_method === 'delivery'
+                    )
                     ->columnSpanFull(),
 
                 TextInput::make('payment_method')
                     ->label('Metode Pembayaran')
-                    ->required()
+                    ->formatStateUsing(fn (?string $state): string => match ($state) {
+                        'bank_transfer' => 'Transfer Bank / Virtual Account',
+                        'qris' => 'QRIS',
+                        'ewallet' => 'E-Wallet',
+                        default => $state ?? '-',
+                    })
                     ->readOnly(),
+
+                TextInput::make('payment_provider')
+                    ->label('Penyedia Pembayaran')
+                    ->formatStateUsing(fn (?string $state): string => match ($state) {
+                        'bni' => 'BNI',
+                        'bri' => 'BRI',
+                        'mandiri' => 'Mandiri',
+                        'bca' => 'BCA',
+                        'qris' => 'QRIS',
+                        'dana' => 'DANA',
+                        'gopay' => 'GoPay',
+                        'ovo' => 'OVO',
+                        'shopeepay' => 'ShopeePay',
+                        default => $state ? strtoupper($state) : '-',
+                    })
+                    ->readOnly(),
+
+                TextInput::make('payment_account_number')
+                    ->label('Nomor VA / E-Wallet Simulasi')
+                    ->placeholder('Nomor belum tersedia')
+                    ->readOnly()
+                    ->visible(fn ($record): bool =>
+                        in_array(
+                            $record?->payment_method,
+                            ['bank_transfer', 'ewallet'],
+                            true
+                        )
+                    ),
+
+                TextInput::make('payment_account_name')
+                    ->label('Nama Penerima Simulasi')
+                    ->placeholder('Nama belum tersedia')
+                    ->readOnly()
+                    ->visible(fn ($record): bool =>
+                        in_array(
+                            $record?->payment_method,
+                            ['bank_transfer', 'ewallet'],
+                            true
+                        )
+                    ),
 
                 Select::make('status')
                     ->label('Status Pesanan')
                     ->options([
-                        'pending' => 'Pending',
+                        'pending' => 'Menunggu',
                         'processing' => 'Diproses',
                         'shipped' => 'Dikirim',
                         'completed' => 'Selesai',
                         'cancelled' => 'Dibatalkan',
                     ])
                     ->required()
-                    ->native(false),
+                    ->native(false)
+                    ->helperText(
+                        'Perubahan status mengikuti aturan alur pesanan CORE.'
+                    ),
 
                 Select::make('payment_status')
                     ->label('Status Pembayaran')
@@ -62,12 +117,15 @@ class OrderForm
                         'paid' => 'Sudah Dibayar',
                     ])
                     ->required()
-                    ->native(false),
+                    ->native(false)
+                    ->helperText(
+                        'Konfirmasi secara manual hanya setelah pembayaran diverifikasi.'
+                    ),
 
                 TextInput::make('total')
                     ->label('Total Pesanan (Rp)')
-                    ->required()
                     ->numeric()
+                    ->prefix('Rp')
                     ->readOnly(),
             ]);
     }

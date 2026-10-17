@@ -31,7 +31,6 @@
             {{-- Progres Pesanan --}}
             @if ($order->status !== 'cancelled')
                 @php
-                    // Langkah progres disesuaikan dengan metode penerimaan.
                     $steps = [
                         'pending' => [
                             'label' => 'Menunggu',
@@ -43,7 +42,6 @@
                         ],
                     ];
 
-                    // Langkah Dikirim hanya untuk pesanan delivery.
                     if ($order->fulfillment_method === 'delivery') {
                         $steps['shipped'] = [
                             'label' => 'Dikirim',
@@ -51,7 +49,6 @@
                         ];
                     }
 
-                    // Langkah Selesai selalu tersedia.
                     $steps['completed'] = [
                         'label' => 'Selesai',
                         'description' => $order->fulfillment_method === 'pickup'
@@ -60,7 +57,11 @@
                     ];
 
                     $stepOrder = array_keys($steps);
-                    $currentIndex = array_search($order->status, $stepOrder, true);
+                    $currentIndex = array_search(
+                        $order->status,
+                        $stepOrder,
+                        true
+                    );
                 @endphp
 
                 <h5 class="fw-bold mb-3">Progres Pesanan</h5>
@@ -68,7 +69,11 @@
                 <div class="border rounded p-3 mb-4">
                     @foreach ($steps as $key => $step)
                         @php
-                            $stepIndex = array_search($key, $stepOrder, true);
+                            $stepIndex = array_search(
+                                $key,
+                                $stepOrder,
+                                true
+                            );
 
                             $isCompleted = $currentIndex !== false
                                 && $stepIndex < $currentIndex;
@@ -147,7 +152,7 @@
                 </strong>
             </div>
 
-            {{-- Alamat hanya ditampilkan untuk delivery --}}
+            {{-- Alamat Pengiriman --}}
             @if ($order->fulfillment_method === 'delivery')
                 <div class="py-2 border-bottom">
                     <div class="text-secondary small">Alamat pengiriman</div>
@@ -179,6 +184,17 @@
                 </strong>
             </div>
 
+            {{-- Penyedia Pembayaran --}}
+            @if ($order->payment_provider)
+                <div class="d-flex justify-content-between gap-3 py-2 border-bottom">
+                    <span>Penyedia pembayaran</span>
+                    <strong class="text-end">
+                        {{ $paymentProviderLabels[$order->payment_provider]
+                            ?? $order->payment_provider }}
+                    </strong>
+                </div>
+            @endif
+
             {{-- Status Pembayaran --}}
             <div class="d-flex justify-content-between align-items-center gap-3 py-2 border-bottom">
                 <span>Status pembayaran</span>
@@ -202,31 +218,84 @@
                             @case('bank_transfer')
                                 <div class="alert alert-info">
                                     <strong>Transfer Bank / Virtual Account</strong>
-                                    <p class="mb-0 mt-2">
-                                        Pembayaran ini masih berupa simulasi.
-                                        CORE belum terhubung dengan bank atau
-                                        penyedia Virtual Account.
+                                    <p class="small mt-2 mb-0">
+                                        Nomor VA berikut hanya untuk simulasi
+                                        proyek CORE dan bukan nomor VA resmi.
                                     </p>
                                 </div>
-                                @break
 
-                            @case('qris')
-                                <div class="alert alert-info">
-                                    <strong>Pembayaran QRIS</strong>
-                                    <p class="mb-0 mt-2">
-                                        Pembayaran QRIS masih berupa simulasi.
-                                        Belum tersedia kode QR pembayaran yang
-                                        dapat digunakan untuk transaksi nyata.
-                                    </p>
+                                <div class="bg-light rounded p-3 mb-3">
+                                    <div class="text-secondary small">
+                                        Penyedia pembayaran
+                                    </div>
+
+                                    <div class="fw-bold mb-3">
+                                        {{ $paymentProviderLabels[$order->payment_provider]
+                                            ?? $order->payment_provider }}
+                                    </div>
+
+                                    <div class="text-secondary small">
+                                        Nomor VA simulasi
+                                    </div>
+
+                                    <div class="fs-4 fw-bold text-break">
+                                        {{ $order->payment_account_number ?? '-' }}
+                                    </div>
+
+                                    <div class="text-secondary small mt-2">
+                                        Nama penerima simulasi
+                                    </div>
+
+                                    <div class="fw-semibold">
+                                        {{ $order->payment_account_name ?? 'CORE' }}
+                                    </div>
                                 </div>
                                 @break
 
                             @case('ewallet')
                                 <div class="alert alert-info">
                                     <strong>Pembayaran E-Wallet</strong>
-                                    <p class="mb-0 mt-2">
-                                        Pembayaran e-wallet masih berupa simulasi
-                                        dan belum terhubung dengan penyedia layanan.
+                                    <p class="small mt-2 mb-0">
+                                        Informasi berikut hanya untuk simulasi.
+                                        CORE belum terhubung dengan penyedia e-wallet.
+                                    </p>
+                                </div>
+
+                                <div class="bg-light rounded p-3 mb-3">
+                                    <div class="text-secondary small">
+                                        Penyedia pembayaran
+                                    </div>
+
+                                    <div class="fw-bold mb-3">
+                                        {{ $paymentProviderLabels[$order->payment_provider]
+                                            ?? $order->payment_provider }}
+                                    </div>
+
+                                    <div class="text-secondary small">
+                                        Nomor e-wallet simulasi
+                                    </div>
+
+                                    <div class="fs-4 fw-bold text-break">
+                                        {{ $order->payment_account_number ?? '085123300335' }}
+                                    </div>
+
+                                    <div class="text-secondary small mt-2">
+                                        Nama penerima simulasi
+                                    </div>
+
+                                    <div class="fw-semibold">
+                                        {{ $order->payment_account_name ?? 'CORE' }}
+                                    </div>
+                                </div>
+                                @break
+
+                            @case('qris')
+                                <div class="alert alert-info">
+                                    <strong>Pembayaran QRIS</strong>
+                                    <p class="small mt-2 mb-0">
+                                        Pembayaran QRIS masih berupa simulasi.
+                                        Belum tersedia kode QR resmi untuk
+                                        transaksi nyata.
                                     </p>
                                 </div>
                                 @break
@@ -239,15 +308,18 @@
 
                         <div class="d-flex justify-content-between align-items-center gap-3">
                             <span class="text-secondary">Total pembayaran</span>
+
                             <strong class="fs-5 text-nowrap">
                                 Rp {{ number_format($order->total, 0, ',', '.') }}
                             </strong>
                         </div>
 
-                        <p class="text-secondary small mt-3 mb-0">
-                            Jangan mengirim uang berdasarkan instruksi simulasi ini.
-                            Status pembayaran hanya berubah setelah admin melakukan
-                            konfirmasi.
+                        <p class="text-danger small mt-3 mb-0">
+                            <strong>SIMULASI:</strong>
+                            Jangan transfer uang ke nomor yang ditampilkan.
+                            CORE belum memproses pembayaran nyata.
+                            Status pembayaran hanya berubah setelah
+                            konfirmasi admin.
                         </p>
                     </div>
                 </div>
@@ -259,7 +331,9 @@
             @foreach ($order->items as $item)
                 <div class="d-flex justify-content-between gap-3 py-2 border-bottom">
                     <div>
-                        <div class="fw-medium">{{ $item->product_name }}</div>
+                        <div class="fw-medium">
+                            {{ $item->product_name }}
+                        </div>
 
                         <div class="text-secondary small">
                             {{ $item->quantity }} ×
@@ -286,8 +360,8 @@
             @if ($order->status === 'cancelled')
                 <div class="alert alert-danger small">
                     Pesanan ini telah dibatalkan. Jika kamu sudah melakukan
-                    pembayaran, silakan hubungi admin untuk informasi penyelesaian
-                    pembayaran atau refund.
+                    pembayaran, silakan hubungi admin untuk informasi
+                    penyelesaian pembayaran atau refund.
                 </div>
             @elseif ($order->payment_status === 'unpaid')
                 <div class="alert alert-warning small">

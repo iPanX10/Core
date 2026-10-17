@@ -89,6 +89,41 @@
             color: #842029;
         }
 
+        .provider-name {
+            display: inline-block;
+            margin-top: 2px;
+            padding: 5px 10px;
+            background: #f1f3f5;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .payment-account {
+            padding: 14px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            overflow-wrap: anywhere;
+        }
+
+        .account-number {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+
+        .simulation-note {
+            padding: 12px;
+            background: #fff3cd;
+            color: #664d03;
+            border: 1px solid #ffecb5;
+            border-radius: 8px;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
         .invoice-note {
             font-size: 13px;
             line-height: 1.6;
@@ -131,7 +166,9 @@
             }
 
             .table tr,
-            .total-box {
+            .total-box,
+            .payment-account,
+            .simulation-note {
                 page-break-inside: avoid;
                 break-inside: avoid;
             }
@@ -162,6 +199,10 @@
             .total-price {
                 font-size: 20px;
             }
+
+            .account-number {
+                font-size: 18px;
+            }
         }
     </style>
 </head>
@@ -187,9 +228,21 @@
         ];
 
         $paymentMethodLabels = [
-            'bank_transfer' => 'Transfer Bank',
+            'bank_transfer' => 'Transfer Bank / Virtual Account',
             'qris' => 'QRIS',
             'ewallet' => 'E-Wallet',
+        ];
+
+        $paymentProviderLabels = [
+            'bni' => 'BNI',
+            'bri' => 'BRI',
+            'mandiri' => 'Mandiri',
+            'bca' => 'BCA',
+            'qris' => 'QRIS',
+            'dana' => 'DANA',
+            'gopay' => 'GoPay',
+            'ovo' => 'OVO',
+            'shopeepay' => 'ShopeePay',
         ];
 
         $createdAt = $order->created_at;
@@ -224,6 +277,7 @@
         {{-- Informasi Pelanggan dan Pembayaran --}}
         <section class="row g-4 my-3">
 
+            {{-- Informasi Pelanggan --}}
             <div class="col-md-6">
                 <div class="section-title">INFORMASI PELANGGAN</div>
 
@@ -238,7 +292,8 @@
                 <div class="mt-3">
                     <div class="muted small">Metode pemenuhan</div>
                     <div>
-                        {{ $fulfillmentLabels[$order->fulfillment_method] ?? $order->fulfillment_method }}
+                        {{ $fulfillmentLabels[$order->fulfillment_method]
+                            ?? $order->fulfillment_method }}
                     </div>
                 </div>
 
@@ -252,30 +307,105 @@
                 @endif
             </div>
 
+            {{-- Informasi Pembayaran --}}
             <div class="col-md-6">
                 <div class="section-title">INFORMASI PEMBAYARAN</div>
 
-                <div class="mb-2">
+                {{-- Metode Pembayaran --}}
+                <div class="mb-3">
                     <div class="muted small">Metode pembayaran</div>
                     <div>
-                        {{ $paymentMethodLabels[$order->payment_method] ?? $order->payment_method }}
+                        {{ $paymentMethodLabels[$order->payment_method]
+                            ?? $order->payment_method }}
                     </div>
                 </div>
 
-                <div class="mb-2">
+                {{-- Penyedia Pembayaran --}}
+                @if ($order->payment_provider)
+                    <div class="mb-3">
+                        <div class="muted small">Penyedia pembayaran</div>
+
+                        <span class="provider-name">
+                            {{ $paymentProviderLabels[$order->payment_provider]
+                                ?? $order->payment_provider }}
+                        </span>
+                    </div>
+                @endif
+
+                {{-- Nomor dan Nama Penerima Simulasi --}}
+                @if (
+                    $order->status !== 'cancelled'
+                    && in_array($order->payment_method, ['bank_transfer', 'ewallet'], true)
+                )
+                    <div class="payment-account mb-3">
+                        @if ($order->payment_method === 'bank_transfer')
+                            <div class="muted small">
+                                Nomor VA simulasi
+                            </div>
+                        @else
+                            <div class="muted small">
+                                Nomor e-wallet simulasi
+                            </div>
+                        @endif
+
+                        <div class="account-number mb-3">
+                            {{ $order->payment_account_number
+                                ?: ($order->payment_method === 'ewallet'
+                                    ? '085123300335'
+                                    : 'Belum tersedia') }}
+                        </div>
+
+                        <div class="muted small">
+                            Nama penerima simulasi
+                        </div>
+
+                        <div class="fw-bold">
+                            {{ $order->payment_account_name ?: 'CORE' }}
+                        </div>
+                    </div>
+                @endif
+
+                {{-- Peringatan Simulasi --}}
+                @if (
+                    $order->status !== 'cancelled'
+                    && in_array($order->payment_method, ['bank_transfer', 'ewallet', 'qris'], true)
+                )
+                    <div class="simulation-note mb-3">
+                        <strong>SIMULASI PEMBAYARAN</strong><br>
+
+                        @if ($order->payment_method === 'bank_transfer')
+                            Nomor VA di atas bukan nomor Virtual Account resmi.
+                        @elseif ($order->payment_method === 'ewallet')
+                            Nomor e-wallet di atas hanya ditampilkan untuk simulasi.
+                        @else
+                            Pembayaran QRIS belum menggunakan kode QR resmi.
+                        @endif
+
+                        <br>
+                        Jangan melakukan transfer atau pembayaran sungguhan
+                        berdasarkan informasi simulasi ini. CORE belum terhubung
+                        dengan penyedia pembayaran.
+                    </div>
+                @endif
+
+                {{-- Status Pembayaran --}}
+                <div class="mb-3">
                     <div class="muted small">Status pembayaran</div>
 
                     @if ($order->payment_status === 'paid')
                         <span class="badge text-bg-success">
-                            {{ $paymentLabels[$order->payment_status] }}
+                            {{ $paymentLabels[$order->payment_status]
+                                ?? $order->payment_status }}
                         </span>
                     @else
                         <span class="badge text-bg-warning">
-                            {{ $paymentLabels[$order->payment_status] ?? $order->payment_status }}
+                            {{ $paymentLabels[$order->payment_status]
+                                ?? $order->payment_status }}
                         </span>
                     @endif
                 </div>
 
+                {{-- Status Pesanan --}}
                 <div>
                     <div class="muted small">Status pesanan</div>
 
@@ -359,6 +489,8 @@
             <div class="muted invoice-note">
                 Simpan invoice ini sebagai referensi rincian pesanan Anda.
                 Status pembayaran dan pesanan mengikuti data terbaru di sistem CORE.
+                Pembayaran pada sistem ini masih berupa simulasi dan tidak memproses
+                transaksi sungguhan.
             </div>
         </footer>
 
@@ -367,8 +499,7 @@
             <button
                 type="button"
                 onclick="window.print()"
-                class="btn btn-dark"
-            >
+                class="btn btn-dark">
                 Cetak / Simpan PDF
             </button>
 
@@ -377,15 +508,13 @@
                     'orderNumber' => $order->order_number,
                     'accessToken' => $order->access_token,
                 ]) }}"
-                class="btn btn-outline-secondary"
-            >
+                class="btn btn-outline-secondary">
                 Kembali ke Pesanan
             </a>
 
             <a
                 href="{{ route('home') }}"
-                class="btn btn-outline-primary"
-            >
+                class="btn btn-outline-primary">
                 Kembali ke Beranda
             </a>
         </div>

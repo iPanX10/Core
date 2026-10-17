@@ -16,11 +16,14 @@ class OrdersTable
                 TextColumn::make('order_number')
                     ->label('Nomor Pesanan')
                     ->searchable()
-                    ->copyable(),
+                    ->copyable()
+                    ->copyMessage('Nomor pesanan berhasil disalin')
+                    ->weight(FontWeight::SemiBold),
 
                 TextColumn::make('customer_name')
                     ->label('Pelanggan')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
 
                 TextColumn::make('whatsapp')
                     ->label('WhatsApp')
@@ -28,62 +31,89 @@ class OrdersTable
                     ->toggleable(),
 
                 TextColumn::make('fulfillment_method')
-                    ->label('Metode Pengambilan')
-                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                    ->label('Metode Penerimaan')
+                    ->formatStateUsing(fn (?string $state): string => match ($state) {
                         'delivery' => 'Pengiriman',
                         'pickup' => 'Ambil di Toko',
-                        default => ucfirst($state),
+                        default => $state ?? '-',
                     })
                     ->badge()
                     ->color('gray'),
 
                 TextColumn::make('payment_method')
                     ->label('Metode Pembayaran')
-                    ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'bank_transfer' => 'Transfer Bank',
+                    ->formatStateUsing(fn (?string $state): string => match ($state) {
+                        'bank_transfer' => 'Transfer Bank / VA',
                         'qris' => 'QRIS',
                         'ewallet' => 'E-Wallet',
-                        default => ucfirst($state),
+                        default => $state ?? '-',
                     })
                     ->badge()
                     ->color('gray'),
 
+                TextColumn::make('payment_provider')
+                    ->label('Penyedia')
+                    ->formatStateUsing(fn (?string $state): string => match ($state) {
+                        'bni' => 'BNI',
+                        'bri' => 'BRI',
+                        'mandiri' => 'Mandiri',
+                        'bca' => 'BCA',
+                        'qris' => 'QRIS',
+                        'dana' => 'DANA',
+                        'gopay' => 'GoPay',
+                        'ovo' => 'OVO',
+                        'shopeepay' => 'ShopeePay',
+                        default => $state ? strtoupper($state) : '-',
+                    })
+                    ->badge()
+                    ->color('gray')
+                    ->toggleable(),
+
+                TextColumn::make('payment_account_number')
+                    ->label('Nomor Pembayaran Simulasi')
+                    ->searchable()
+                    ->copyable()
+                    ->placeholder('Belum tersedia')
+                    ->toggleable(isToggledHiddenByDefault: true),
+
                 TextColumn::make('status')
                     ->label('Status Pesanan')
-                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                    ->formatStateUsing(fn (?string $state): string => match ($state) {
                         'pending' => 'Menunggu',
                         'processing' => 'Diproses',
                         'shipped' => 'Dikirim',
                         'completed' => 'Selesai',
                         'cancelled' => 'Dibatalkan',
-                        default => ucfirst($state),
+                        default => $state ?? '-',
                     })
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn (?string $state): string => match ($state) {
                         'pending' => 'warning',
                         'processing' => 'info',
                         'shipped' => 'primary',
                         'completed' => 'success',
                         'cancelled' => 'danger',
                         default => 'gray',
-                    }),
+                    })
+                    ->sortable(),
 
                 TextColumn::make('payment_status')
-                    ->label('Pembayaran')
-                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                    ->label('Status Pembayaran')
+                    ->formatStateUsing(fn (?string $state): string => match ($state) {
                         'unpaid' => 'Belum Dibayar',
                         'paid' => 'Sudah Dibayar',
-                        default => ucfirst($state),
+                        default => $state ?? '-',
                     })
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn (?string $state): string => match ($state) {
                         'unpaid' => 'danger',
                         'paid' => 'success',
                         default => 'gray',
-                    }),
+                    })
+                    ->sortable(),
 
                 TextColumn::make('total')
-                    ->label('Total')
+                    ->label('Total Pesanan')
                     ->money('IDR', locale: 'id')
                     ->weight(FontWeight::SemiBold)
                     ->sortable(),

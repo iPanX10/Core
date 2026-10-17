@@ -36,11 +36,19 @@ class Product extends Model
 
     public function getDiscountedPriceAttribute(): float
     {
-        if (! $this->discount_active || $this->discount_percentage <= 0) {
-            return (float) $this->price;
+        $price = max(0, (float) $this->price);
+        $discount = (float) $this->discount_percentage;
+
+        if (! $this->discount_active || $discount <= 0) {
+            return round($price, 2);
         }
 
-        return (float) $this->price
-            * (1 - (float) $this->discount_percentage / 100);
+        // Batasi diskon agar tidak melebihi 100%.
+        $discount = min($discount, 100);
+
+        return round(
+            $price * (1 - $discount / 100),
+            2
+        );
     }
 }

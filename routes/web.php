@@ -15,26 +15,24 @@ use App\Http\Controllers\CheckoutController;
 Route::get('/', function (Request $request) {
     $query = Product::with('category');
 
-    // Pencarian berdasarkan nama produk
+    // Pencarian produk
     if ($request->filled('search')) {
-        $query->where(
-            'name',
-            'like',
-            '%' . $request->search . '%'
-        );
+        $search = trim((string) $request->input('search'));
+
+        $query->where('name', 'like', '%' . $search . '%');
     }
 
-    // Filter berdasarkan kategori
+    // Filter kategori
     if ($request->filled('category')) {
-        $query->whereHas('category', function ($categoryQuery) use ($request) {
-            $categoryQuery->where('slug', $request->category);
+        $query->whereHas('category', function ($q) use ($request) {
+            $q->where('slug', $request->input('category'));
         });
     }
 
-    // Pengurutan harga
-    if ($request->sort === 'price_asc') {
+    // Pengurutan produk
+    if ($request->input('sort') === 'price_asc') {
         $query->orderBy('price', 'asc');
-    } elseif ($request->sort === 'price_desc') {
+    } elseif ($request->input('sort') === 'price_desc') {
         $query->orderBy('price', 'desc');
     } else {
         $query->latest();
@@ -51,7 +49,7 @@ Route::get('/', function (Request $request) {
 // DETAIL PRODUK
 // ==================================================
 
-Route::get('/produk/{slug}', function ($slug) {
+Route::get('/produk/{slug}', function (string $slug) {
     $product = Product::with('category')
         ->where('slug', $slug)
         ->firstOrFail();
@@ -61,39 +59,85 @@ Route::get('/produk/{slug}', function ($slug) {
 
 
 // ==================================================
-// KERANJANG BELANJA
+// MENAMPILKAN KERANJANG
 // ==================================================
 
-// Menampilkan isi keranjang
 Route::get('/keranjang', function () {
     $cart = Session::get('cart', []);
 
-    $products = Product::whereIn(
-        'id',
-        array_keys($cart)
-    )->get()->keyBy('id');
-
-    $total = 0;
-
-    foreach ($cart as $productId => $quantity) {
-        if (isset($products[$productId])) {
-            $product = $products[$productId];
-
-            $price = $product->discount_active
-                && $product->discount_percentage > 0
-                ? $product->discounted_price
-                : $product->price;
-
-            $total += $price * $quantity;
-        }
+    if (!is_array($cart)) {
+        $cart = [];
     }
 
-    return view('cart.index', compact('cart', 'products', 'total'));
+    // Validasi ID dan jumlah produk.
+    $validCart = [];
+
+    foreach ($cart as $productId => $quantity) {
+        $id = filter_var($productId, FILTER_VALIDATE_INT);
+        $qty = filter_var($quantity, FILTER_VALIDATE_INT);
+
+        if (
+            $id === false ||
+            $id < 1 ||
+            $qty === false ||
+            $qty < 1
+        ) {
+            continue;
+        }
+
+        $validCart[$id] = ($validCart[$id] ?? 0) + $qty;
+    }
+
+    // Ambil seluruh produk dalam keranjang.
+    $products = Product::with('category')
+        ->whereIn('id', array_keys($validCart))
+        ->get()
+        ->keyBy('id');
+
+    $cartForView = [];
+    $total = 0;
+    $itemCount = 0;
+
+    foreach ($validCart as $productId => $quantity) {
+        $product = $products->get((int) $productId);
+
+        if (!$product || $product->stock < 1) {
+            continue;
+        }
+
+        // Batasi jumlah sesuai stok terbaru.
+        $quantity = min($quantity, (int) $product->stock);
+
+        if ($quantity < 1) {
+            continue;
+        }
+
+        $cartForView[(int) $productId] = $quantity;
+
+        // Samakan accessor harga dengan CheckoutController.
+        $price = (float) $product->discounted_price;
+
+        $total += $price * $quantity;
+        $itemCount += $quantity;
+    }
+
+    // Simpan keranjang yang sudah divalidasi.
+    Session::put('cart', $cartForView);
+
+    return view('cart.index', [
+        'cart' => $cartForView,
+        'products' => $products,
+        'total' => $total,
+        'itemCount' => $itemCount,
+    ]);
 })->name('cart.index');
 
 
-// Menambahkan produk ke keranjang
-Route::post('/keranjang/tambah/{id}', function ($id) {
+// ==================================================
+// MENAMBAHKAN PRODUK KE KERANJANG
+// ==================================================
+
+Route::post('/keranjang/tambah/{id}', function (int $id) {
     $product = Product::findOrFail($id);
 
     if ($product->stock < 1) {
@@ -101,88 +145,169 @@ Route::post('/keranjang/tambah/{id}', function ($id) {
     }
 
     $cart = Session::get('cart', []);
-    $quantity = ($cart[$id] ?? 0) + 1;
 
-    if ($quantity > $product->stock) {
-        return back()->with('error', 'Jumlah melebihi stok tersedia.');
+    if (!is_array($cart)) {
+        $cart = [];
     }
 
-    $cart[$id] = $quantity;
-    Session::put('cart', $cart);
+    $currentQuantity = filter_var(
+        $cart[$id] ?? 0,
+        FILTER_VALIDATE_INT
+    );
 
-    return redirect()->route('cart.index')
-        ->with('success', 'Produk berhasil ditambahkan ke keranjang.');
-})->name('cart.add');
+    if ($currentQuantity === false || $currentQuantity < 0) {
+        $currentQuantity = 0;
+    }
 
+    $newQuantity = $currentQuantity + 1;
 
-// Mengubah jumlah produk di keranjang
-Route::post('/keranjang/ubah/{id}', function (Request $request, $id) {
-    $product = Product::findOrFail($id);
-
-    $request->validate([
-        'quantity' => 'required|integer|min:1',
-    ]);
-
-    $quantity = (int) $request->quantity;
-
-    if ($quantity > $product->stock) {
+    if ($newQuantity > $product->stock) {
         return back()->with(
             'error',
             'Jumlah melebihi stok tersedia: ' . $product->stock
         );
     }
 
-    $cart = session('cart', []);
+    // Pertahankan produk lain di keranjang.
+    $cart[$id] = $newQuantity;
 
-    if (!array_key_exists($id, $cart)) {
-        return back()->with('error', 'Produk tidak ada di keranjang.');
+    Session::put('cart', $cart);
+
+    return redirect()
+        ->route('cart.index')
+        ->with('success', 'Produk berhasil ditambahkan ke keranjang.');
+})->whereNumber('id')->name('cart.add');
+
+
+// ==================================================
+// MEMPERBARUI JUMLAH PRODUK - OTOMATIS DENGAN JSON
+// ==================================================
+
+Route::post('/keranjang/ubah/{id}', function (
+    Request $request,
+    int $id
+) {
+    // Validasi jumlah.
+    $validated = $request->validate([
+        'quantity' => ['required', 'integer', 'min:1'],
+    ]);
+
+    $cart = Session::get('cart', []);
+
+    if (!is_array($cart) || !array_key_exists($id, $cart)) {
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Produk tidak ditemukan di keranjang.',
+            ], 404);
+        }
+
+        return back()->with(
+            'error',
+            'Produk tidak ditemukan di keranjang.'
+        );
     }
 
+    $product = Product::find($id);
+
+    if (!$product) {
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Produk tidak ditemukan.',
+            ], 404);
+        }
+
+        return back()->with(
+            'error',
+            'Produk tidak ditemukan.'
+        );
+    }
+
+    $quantity = (int) $validated['quantity'];
+
+    // Periksa stok terbaru.
+    if ($product->stock < 1 || $quantity > $product->stock) {
+        $message = 'Jumlah melebihi stok tersedia atau produk sedang habis.';
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => false,
+                'message' => $message,
+            ], 422);
+        }
+
+        return back()->with('error', $message);
+    }
+
+    // Ubah jumlah produk tanpa menghapus produk lain.
     $cart[$id] = $quantity;
-    session(['cart' => $cart]);
 
-    return redirect()->route('cart.index')
+    Session::put('cart', $cart);
+    Session::save();
+
+    // Respons JSON dibutuhkan oleh JavaScript cart.index.
+    if ($request->expectsJson()) {
+        return response()->json([
+            'success' => true,
+            'quantity' => $quantity,
+            'message' => 'Jumlah produk berhasil diperbarui.',
+        ]);
+    }
+
+    // Tetap mendukung pengiriman form biasa.
+    return redirect()
+        ->route('cart.index')
         ->with('success', 'Jumlah produk berhasil diperbarui.');
-})->name('cart.update');
+})->whereNumber('id')->name('cart.update');
 
 
-// Menghapus produk dari keranjang
-Route::delete('/keranjang/hapus/{id}', function ($id) {
-    $cart = session('cart', []);
+// ==================================================
+// MENGHAPUS PRODUK DARI KERANJANG
+// ==================================================
 
-    if (!array_key_exists($id, $cart)) {
-        return back()->with('error', 'Produk tidak ada di keranjang.');
+Route::delete('/keranjang/hapus/{id}', function (int $id) {
+    $cart = Session::get('cart', []);
+
+    if (!is_array($cart) || !array_key_exists($id, $cart)) {
+        return back()->with(
+            'error',
+            'Produk tidak ditemukan di keranjang.'
+        );
     }
 
     unset($cart[$id]);
-    session(['cart' => $cart]);
 
-    return redirect()->route('cart.index')
+    Session::put('cart', $cart);
+
+    return redirect()
+        ->route('cart.index')
         ->with('success', 'Produk berhasil dihapus dari keranjang.');
-})->name('cart.remove');
+})->whereNumber('id')->name('cart.remove');
 
 
 // ==================================================
 // CHECKOUT
 // ==================================================
 
-// Halaman checkout
-Route::get('/checkout', [CheckoutController::class, 'index'])
-    ->name('checkout.index');
+Route::get('/checkout', [
+    CheckoutController::class,
+    'index',
+])->name('checkout.index');
 
-// Memproses pesanan
-Route::post('/checkout', [CheckoutController::class, 'store'])
-    ->name('checkout.store');
+Route::post('/checkout', [
+    CheckoutController::class,
+    'store',
+])->name('checkout.store');
 
 
 // ==================================================
-// DETAIL DAN PELACAKAN PESANAN
+// DETAIL PESANAN
 // ==================================================
 
-// Halaman konfirmasi dan pelacakan pesanan
 Route::get('/pesanan/{orderNumber}/{accessToken}', [
     CheckoutController::class,
-    'success'
+    'success',
 ])->name('checkout.success');
 
 
@@ -190,10 +315,9 @@ Route::get('/pesanan/{orderNumber}/{accessToken}', [
 // INVOICE PESANAN
 // ==================================================
 
-// Halaman invoice pesanan
 Route::get('/pesanan/{orderNumber}/{accessToken}/invoice', [
     CheckoutController::class,
-    'invoice'
+    'invoice',
 ])->name('checkout.invoice');
 
 
@@ -201,13 +325,15 @@ Route::get('/pesanan/{orderNumber}/{accessToken}/invoice', [
 // RIWAYAT PESANAN
 // ==================================================
 
-// Form pencarian riwayat pesanan
 Route::get('/riwayat-pesanan', function () {
     return view('orders.history');
 })->name('orders.history');
 
 
-// Pencarian pesanan berdasarkan nomor pesanan dan WhatsApp
+// ==================================================
+// PENCARIAN RIWAYAT PESANAN
+// ==================================================
+
 Route::post('/riwayat-pesanan', function (Request $request) {
     $validated = $request->validate([
         'order_number' => ['required', 'string', 'max:50'],
@@ -228,16 +354,14 @@ Route::post('/riwayat-pesanan', function (Request $request) {
         ->where('access_token', '!=', '')
         ->first();
 
-    // Pesanan tidak ditemukan
-    if (! $order) {
+    if (!$order) {
         return back()
             ->withInput()
             ->withErrors([
-                'order_number' => 'Pesanan tidak ditemukan. Periksa kembali nomor pesanan dan WhatsApp.',
+                'order_number' =>
+                    'Pesanan tidak ditemukan. Periksa kembali nomor pesanan dan WhatsApp.',
             ]);
     }
 
-    // Menampilkan ringkasan pesanan
     return view('orders.result', compact('order'));
-
 })->middleware('throttle:5,1')->name('orders.history.search');
