@@ -18,6 +18,29 @@
 
     <link rel="stylesheet" href="{{ asset('css/core.css') }}">
 
+    <style>
+        html,
+        body {
+            min-height: 100%;
+            margin: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #main-content {
+            flex: 1 0 auto;
+        }
+
+        #kontak {
+            flex-shrink: 0;
+            margin-top: 0 !important;
+        }
+    </style>
+
     @stack('styles')
 </head>
 <body>

@@ -97,17 +97,31 @@ class OrderForm
 
                 Select::make('status')
                     ->label('Status Pesanan')
-                    ->options([
-                        'pending' => 'Menunggu',
-                        'processing' => 'Diproses',
-                        'shipped' => 'Dikirim',
-                        'completed' => 'Selesai',
-                        'cancelled' => 'Dibatalkan',
-                    ])
+                    ->options(fn ($record): array => (
+                        $record?->fulfillment_method === 'pickup'
+                            ? [
+                                'pending' => 'Menunggu',
+                                'processing' => 'Diproses',
+                                'completed' => 'Selesai',
+                                'cancelled' => 'Dibatalkan',
+                            ]
+                            : [
+                                'pending' => 'Menunggu',
+                                'processing' => 'Diproses',
+                                'shipped' => 'Dikirim',
+                                'completed' => 'Selesai',
+                                'cancelled' => 'Dibatalkan',
+                            ]
+                    ))
+                    ->rules(fn ($record): array => (
+                        $record?->fulfillment_method === 'pickup'
+                            ? ['not_in:shipped']
+                            : []
+                    ))
                     ->required()
                     ->native(false)
                     ->helperText(
-                        'Perubahan status mengikuti aturan alur pesanan CORE.'
+                        'Pesanan ambil di toko tidak dapat menggunakan status Dikirim.'
                     ),
 
                 Select::make('payment_status')

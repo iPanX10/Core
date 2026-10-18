@@ -1,0 +1,589 @@
+﻿<x-filament-panels::page.simple>
+    <div class="core-login-wrapper">
+        {{-- PANEL KIRI: BRANDING --}}
+        <section class="core-login-brand">
+            <div class="core-brand-top">
+                <div class="core-brand-logo">C<span>.</span></div>
+                <span class="core-brand-label">ADMINISTRATION PORTAL</span>
+            </div>
+
+            <div class="core-brand-content">
+                <span class="core-eyebrow">
+                    <span class="core-status-dot"></span>
+                    SYSTEM MANAGEMENT
+                </span>
+
+                <h1>Built for<br>Performance.</h1>
+
+                <p>
+                    Manage your hardware business with precision.
+                    One platform to control products, orders, and operations.
+                </p>
+
+                <div class="core-hardware-art" aria-hidden="true">
+                    <div class="core-art-ring core-art-ring-one"></div>
+                    <div class="core-art-ring core-art-ring-two"></div>
+
+                    <div class="core-chip">
+                        <div class="core-chip-inner">
+                            <span>CORE</span>
+                            <strong>âˆž</strong>
+                            <small>HIGH PERFORMANCE</small>
+                        </div>
+                    </div>
+
+                    <div class="core-art-line core-art-line-one"></div>
+                    <div class="core-art-line core-art-line-two"></div>
+                    <div class="core-art-line core-art-line-three"></div>
+
+                    <div class="core-art-node core-node-one"></div>
+                    <div class="core-art-node core-node-two"></div>
+                    <div class="core-art-node core-node-three"></div>
+                </div>
+            </div>
+
+            <div class="core-brand-footer">
+                <span>CORE. HARDWARE STORE</span>
+                <span>EST. 2026</span>
+            </div>
+        </section>
+
+        {{-- PANEL KANAN: FORM LOGIN --}}
+        <section class="core-login-form-panel">
+            <div class="core-mobile-logo">
+                CORE<span>.</span>
+            </div>
+
+            <div class="core-form-heading">
+                <div class="core-admin-icon">
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <rect x="4" y="10" width="16" height="11" rx="2"
+                              stroke="currentColor" stroke-width="1.6"/>
+                        <path d="M8 10V7a4 4 0 0 1 8 0v3"
+                              stroke="currentColor" stroke-width="1.6"
+                              stroke-linecap="round"/>
+                        <circle cx="12" cy="15" r="1.2" fill="currentColor"/>
+                    </svg>
+                </div>
+
+                <span class="core-form-overline">ADMINISTRATOR ACCESS</span>
+                <h2>Welcome back<span>.</span></h2>
+                <p>Sign in to manage your CORE dashboard.</p>
+            </div>
+
+            <x-filament-panels::form id="form" wire:submit="authenticate">
+                <div class="core-login-fields">
+                    {{ $this->form }}
+                </div>
+
+                <div class="core-login-actions">
+                    <button type="submit" class="fi-btn core-login-submit">
+    <span class="fi-btn-label">Sign in to dashboard</span>
+</button>
+                </div>
+            </x-filament-panels::form>
+
+            <div class="core-secure-note">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M12 3 19 6v5c0 4.5-3 7.5-7 10-4-2.5-7-5.5-7-10V6l7-3Z"
+                          stroke="currentColor" stroke-width="1.5"
+                          stroke-linejoin="round"/>
+                    <path d="m9 12 2 2 4-4"
+                          stroke="currentColor" stroke-width="1.5"
+                          stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+
+                <span>
+                    <strong>Secure administrator access</strong>
+                    <small>Authorized personnel only.</small>
+                </span>
+            </div>
+
+            <div class="core-form-footer">
+                <span>Â© {{ date('Y') }} CORE Hardware Store</span>
+                <span>ADMIN PORTAL Â· V1.0</span>
+            </div>
+        </section>
+    </div>
+</x-filament-panels::page.simple>
+
+<style>
+    :root {
+        --core-bg: #101113;
+        --core-panel: #17181b;
+        --core-border: #303136;
+        --core-text: #f2f2f3;
+        --core-muted: #96979e;
+        --core-silver: #d2d3d6;
+    }
+
+    /* PAGE BACKGROUND */
+    .fi-simple-main {
+        width: 100% !important;
+        max-width: 1120px !important;
+        padding: 24px !important;
+    }
+
+    .fi-simple-page {
+        gap: 0 !important;
+    }
+
+    .core-login-wrapper {
+        display: grid;
+        grid-template-columns: 1.05fr 0.95fr;
+        width: 100%;
+        min-height: 620px;
+        overflow: hidden;
+        background: var(--core-panel);
+        border: 1px solid var(--core-border);
+        border-radius: 20px;
+        color: var(--core-text);
+        box-shadow: 0 28px 90px rgb(0 0 0 / 35%);
+    }
+
+    /* LEFT BRANDING PANEL */
+    .core-login-brand {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-width: 0;
+        overflow: hidden;
+        padding: 42px;
+        background:
+            radial-gradient(ellipse at 55% 60%, #34363b 0%, transparent 48%),
+            linear-gradient(145deg, #222327, #151619 72%);
+        border-right: 1px solid #36373b;
+    }
+
+    .core-brand-top {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .core-brand-logo {
+        font-size: 35px;
+        line-height: 1;
+        font-weight: 900;
+        letter-spacing: -3px;
+        color: #f7f7f8;
+    }
+
+    .core-brand-logo span,
+    .core-mobile-logo span {
+        color: #8f9299;
+    }
+
+    .core-brand-label {
+        padding-left: 15px;
+        border-left: 1px solid #55565b;
+        color: #a8a9af;
+        font-size: 9px;
+        font-weight: 700;
+        letter-spacing: 2px;
+    }
+
+    .core-brand-content {
+        position: relative;
+        z-index: 1;
+        margin-top: 44px;
+    }
+
+    .core-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        color: #c1c2c7;
+        font-size: 9px;
+        font-weight: 700;
+        letter-spacing: 2px;
+    }
+
+    .core-status-dot {
+        width: 7px;
+        height: 7px;
+        background: #d5d6d9;
+        border-radius: 50%;
+        box-shadow: 0 0 12px rgb(220 220 225 / 45%);
+    }
+
+    .core-brand-content h1 {
+        margin: 22px 0 14px;
+        color: #f5f5f6;
+        font-size: clamp(34px, 4vw, 48px);
+        font-weight: 750;
+        line-height: 1.08;
+        letter-spacing: -2px;
+    }
+
+    .core-brand-content > p {
+        max-width: 340px;
+        margin: 0;
+        color: #a8a9b0;
+        font-size: 12px;
+        line-height: 1.9;
+    }
+
+    /* ABSTRACT HARDWARE ILLUSTRATION */
+    .core-hardware-art {
+        position: relative;
+        height: 175px;
+        margin: 10px -10px 0;
+        overflow: hidden;
+    }
+
+    .core-art-ring {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        aspect-ratio: 1;
+        border: 1px solid rgb(205 207 214 / 12%);
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    .core-art-ring-one {
+        width: 170px;
+    }
+
+    .core-art-ring-two {
+        width: 235px;
+    }
+
+    .core-chip {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        display: grid;
+        width: 112px;
+        height: 112px;
+        padding: 8px;
+        border: 1px solid #74767d;
+        background: linear-gradient(135deg, #606168, #202125 65%);
+        box-shadow: 0 0 35px rgb(0 0 0 / 45%), inset 0 0 15px #777981;
+        transform: translate(-50%, -50%) rotate(-8deg);
+    }
+
+    .core-chip-inner {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        border: 1px solid #777981;
+        background: linear-gradient(145deg, #34353a, #151619);
+    }
+
+    .core-chip-inner span {
+        color: #c7c8cd;
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 3px;
+    }
+
+    .core-chip-inner strong {
+        color: #e5e6e9;
+        font-size: 28px;
+        line-height: 1;
+    }
+
+    .core-chip-inner small {
+        color: #a8a9b0;
+        font-size: 5px;
+        letter-spacing: 1px;
+    }
+
+    .core-art-line {
+        position: absolute;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, #777981, transparent);
+        transform: rotate(-25deg);
+    }
+
+    .core-art-line-one {
+        top: 36px;
+        left: 8%;
+        width: 40%;
+    }
+
+    .core-art-line-two {
+        right: 3%;
+        bottom: 42px;
+        width: 40%;
+        transform: rotate(25deg);
+    }
+
+    .core-art-line-three {
+        top: 45%;
+        right: 8%;
+        width: 25%;
+    }
+
+    .core-art-node {
+        position: absolute;
+        width: 5px;
+        height: 5px;
+        border: 1px solid #b9bbc1;
+        background: #42444a;
+        transform: rotate(45deg);
+    }
+
+    .core-node-one {
+        top: 32px;
+        left: 28%;
+    }
+
+    .core-node-two {
+        right: 20%;
+        bottom: 35px;
+    }
+
+    .core-node-three {
+        top: 45%;
+        left: 14%;
+    }
+
+    .core-brand-footer {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        padding-top: 20px;
+        border-top: 1px solid #3b3c41;
+        color: #8f9097;
+        font-size: 8px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+    }
+
+    /* RIGHT FORM PANEL */
+    .core-login-form-panel {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-width: 0;
+        padding: 48px clamp(28px, 4vw, 54px);
+        background: linear-gradient(160deg, #1b1c20, #17181b);
+    }
+
+    .core-mobile-logo {
+        display: none;
+        margin-bottom: 36px;
+        color: #f5f5f6;
+        font-size: 29px;
+        font-weight: 900;
+        letter-spacing: -2px;
+    }
+
+    .core-form-heading {
+        margin-bottom: 30px;
+    }
+
+    .core-admin-icon {
+        display: grid;
+        width: 43px;
+        height: 43px;
+        margin-bottom: 25px;
+        place-items: center;
+        border: 1px solid #45464c;
+        border-radius: 12px;
+        background: linear-gradient(145deg, #33343a, #202125);
+        color: #e0e1e5;
+    }
+
+    .core-admin-icon svg {
+        width: 21px;
+        height: 21px;
+    }
+
+    .core-form-overline {
+        color: #a5a6ad;
+        font-size: 9px;
+        font-weight: 750;
+        letter-spacing: 2px;
+    }
+
+    .core-form-heading h2 {
+        margin: 11px 0 9px;
+        color: #f3f3f5;
+        font-size: clamp(27px, 3vw, 34px);
+        font-weight: 750;
+        letter-spacing: -1.3px;
+    }
+
+    .core-form-heading h2 span {
+        color: #aeb0b7;
+    }
+
+    .core-form-heading > p {
+        margin: 0;
+        color: var(--core-muted);
+        font-size: 12px;
+        line-height: 1.8;
+    }
+
+    /* FILAMENT INPUTS */
+    .core-login-fields {
+        display: flex;
+        flex-direction: column;
+        gap: 19px;
+    }
+
+    .core-login-form-panel .fi-fo-field-wrp-label {
+        color: #d6d7db !important;
+        font-size: 11px !important;
+        font-weight: 600 !important;
+    }
+
+    .core-login-form-panel .fi-input-wrp {
+        min-height: 46px;
+        border: 1px solid #393a40 !important;
+        border-radius: 9px !important;
+        background: #131417 !important;
+        box-shadow: none !important;
+        transition: border-color .2s, box-shadow .2s;
+    }
+
+    .core-login-form-panel .fi-input-wrp:focus-within {
+        border-color: #999ba3 !important;
+        box-shadow: 0 0 0 3px rgb(200 201 207 / 7%) !important;
+    }
+
+    .core-login-form-panel .fi-input {
+        color: #f1f1f3 !important;
+        font-size: 12px !important;
+    }
+
+    .core-login-form-panel .fi-input::placeholder {
+        color: #696a72 !important;
+    }
+
+    .core-login-form-panel .fi-checkbox-input {
+        border-color: #64656d !important;
+        background-color: #17181b !important;
+    }
+
+    .core-login-form-panel .fi-fo-field-wrp-helper-text,
+    .core-login-form-panel .fi-checkbox-label {
+        color: #b5b6bd !important;
+        font-size: 11px !important;
+    }
+
+    .core-login-actions {
+        margin-top: 25px;
+    }
+
+    .core-login-actions .fi-btn {
+        min-height: 46px;
+        border: 1px solid #e0e1e5 !important;
+        border-radius: 9px !important;
+        background: linear-gradient(110deg, #e2e3e6, #b9bbc2) !important;
+        color: #17181b !important;
+        font-size: 12px !important;
+        font-weight: 750 !important;
+        box-shadow: 0 5px 18px rgb(0 0 0 / 20%);
+        transition: filter .2s, transform .2s;
+    }
+
+    .core-login-actions .fi-btn:hover {
+        filter: brightness(1.08);
+        transform: translateY(-1px);
+    }
+
+    .core-login-actions .fi-btn .fi-btn-label {
+        color: #17181b !important;
+    }
+
+    .core-secure-note {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 30px;
+        padding: 15px;
+        border: 1px solid #33343a;
+        border-radius: 10px;
+        background: rgb(255 255 255 / 2%);
+    }
+
+    .core-secure-note svg {
+        flex: 0 0 21px;
+        width: 21px;
+        height: 21px;
+        color: #b7b9c0;
+    }
+
+    .core-secure-note span {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .core-secure-note strong {
+        color: #d7d8dc;
+        font-size: 10px;
+        font-weight: 650;
+    }
+
+    .core-secure-note small {
+        color: #85868e;
+        font-size: 10px;
+    }
+
+    .core-form-footer {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 8px;
+        margin-top: 35px;
+        padding-top: 18px;
+        border-top: 1px solid #303136;
+        color: #777880;
+        font-size: 8px;
+        letter-spacing: .7px;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 760px) {
+        .fi-simple-main {
+            max-width: 500px !important;
+            padding: 15px !important;
+        }
+
+        .core-login-wrapper {
+            grid-template-columns: 1fr;
+            min-height: auto;
+        }
+
+        .core-login-brand {
+            display: none;
+        }
+
+        .core-login-form-panel {
+            padding: 32px 25px;
+        }
+
+        .core-mobile-logo {
+            display: block;
+        }
+
+        .core-form-heading {
+            margin-bottom: 25px;
+        }
+
+        .core-secure-note {
+            margin-top: 25px;
+        }
+
+        .core-form-footer {
+            margin-top: 28px;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .core-login-form-panel *,
+        .core-login-actions .fi-btn {
+            transition: none !important;
+        }
+    }
+</style>

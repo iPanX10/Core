@@ -37,14 +37,22 @@ class EditOrder extends EditRecord
             $newPaymentStatus = $data['payment_status']
                 ?? $oldPaymentStatus;
 
-            // Status pesanan yang diperbolehkan.
-            $allowedTransitions = [
-                'pending' => ['processing', 'cancelled'],
-                'processing' => ['shipped', 'cancelled'],
-                'shipped' => ['completed'],
-                'completed' => [],
-                'cancelled' => [],
-            ];
+            // Status pesanan mengikuti metode penerimaan.
+            $allowedTransitions = $order->fulfillment_method === 'pickup'
+                ? [
+                    'pending' => ['processing', 'cancelled'],
+                    'processing' => ['completed', 'cancelled'],
+                    'shipped' => [],
+                    'completed' => [],
+                    'cancelled' => [],
+                ]
+                : [
+                    'pending' => ['processing', 'cancelled'],
+                    'processing' => ['shipped', 'cancelled'],
+                    'shipped' => ['completed'],
+                    'completed' => [],
+                    'cancelled' => [],
+                ];
 
             $validStatuses = [
                 'pending',

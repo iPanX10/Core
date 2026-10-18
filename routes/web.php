@@ -365,3 +365,5 @@ Route::post('/riwayat-pesanan', function (Request $request) {
 
     return view('orders.result', compact('order'));
 })->middleware('throttle:5,1')->name('orders.history.search');
+
+Route::view('/lokasi', 'lokasi')->name('lokasi');

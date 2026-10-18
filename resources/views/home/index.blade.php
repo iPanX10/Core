@@ -339,161 +339,254 @@
         text-decoration: underline;
     }
 
-    /* PRODUCT CARDS */
-    .core-product-card {
+    
+    /* ========================================
+    PRODUCT CARDS — CLEAN SILVER TECH
+    ======================================== */
+
+    .core-home .core-product-card {
         position: relative;
         display: flex;
         flex-direction: column;
         height: 100%;
         overflow: hidden;
-        border: 1px solid #e4e7eb;
-        border-radius: 13px;
+
         background: #fff;
-        transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+        border: 1px solid #e2e5e9;
+        border-radius: 12px;
+
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
     }
 
-    .core-product-card:hover {
-        border-color: #c4c9d0;
-        transform: translateY(-4px);
-        box-shadow: 0 14px 32px rgba(25,30,38,.08);
+    .core-home .core-product-card:hover {
+        border-color: #bfc5cd;
+        box-shadow: 0 8px 24px rgba(17, 19, 21, 0.07);
+        transform: none;
     }
 
-    .core-product-image-wrap {
+    /* Product image */
+
+    .core-home .core-product-image-wrap {
         position: relative;
         display: flex;
         align-items: center;
         justify-content: center;
+
         padding: 16px;
-        background: linear-gradient(145deg, #f7f8fa, #eceff2);
+        background: #f7f8fa;
+        border-bottom: 1px solid #edf0f3;
     }
 
-    .core-product-image {
+    .core-home .core-product-image {
         display: block;
         width: 100%;
         height: 190px;
         object-fit: contain;
-        mix-blend-mode: multiply;
+        mix-blend-mode: normal;
     }
 
-    .core-product-badge {
+    /* Discount badge */
+
+    .core-home .core-product-badge {
         position: absolute;
         top: 12px;
         left: 12px;
-        padding: 5px 9px;
-        border: 1px solid #d8dde3;
+        z-index: 1;
+
+        padding: 4px 8px;
+    border: 1px solid #d9dde2;
         border-radius: 6px;
-        background: rgba(255,255,255,.94);
-        color: #333943;
-        font-size: .7rem;
+
+        background: #dc2626;
+        color: #fff;
+        border: 1px solid #dc2626;
+
+        font-size: 0.7rem;
         font-weight: 700;
     }
 
-    .core-product-body {
+    /* Product information */
+
+    .core-home .core-product-body {
         display: flex;
         flex: 1;
         flex-direction: column;
-        padding: 17px;
+        padding: 16px;
     }
 
-    .core-product-category {
+    .core-home .core-product-category {
         margin-bottom: 7px;
-        color: #727a85;
-        font-size: .76rem;
+        color: #737982;
+        font-size: 0.76rem;
+        font-weight: 500;
     }
 
-    .core-product-name {
+    .core-home .core-product-name {
         display: -webkit-box;
-        min-height: 42px;
+        min-height: 2.8em;
         margin-bottom: 8px;
         overflow: hidden;
-        color: #202329;
-        font-size: .98rem;
-        font-weight: 750;
+
+        color: #202328;
+        font-size: 0.96rem;
+        font-weight: 700;
         line-height: 1.4;
+
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
     }
 
-    .core-product-description {
+    .core-home .core-product-description {
         display: -webkit-box;
-        min-height: 39px;
-        margin-bottom: 15px;
+        min-height: 2.9em;
+        margin-bottom: 16px;
         overflow: hidden;
-        color: #727a85;
-        font-size: .8rem;
+
+        color: #737982;
+        font-size: 0.8rem;
         line-height: 1.5;
+
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
     }
 
-    .core-product-price {
-        margin-bottom: 3px;
-        color: #202329;
-        font-size: 1.13rem;
-        font-weight: 800;
-        letter-spacing: -.025em;
-        overflow-wrap: anywhere;
-    }
+    /* Price */
 
-    .core-product-old-price {
-        margin-bottom: 4px;
-        color: #89909a;
-        font-size: .8rem;
+    .core-home .core-product-old-price {
+        margin-bottom: 3px;
+        color: #858b94;
+        font-size: 0.8rem;
         text-decoration: line-through;
     }
 
-    .core-stock {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        margin-top: 9px;
-        margin-bottom: 15px;
-        font-size: .78rem;
+    .core-home .core-product-price {
+        margin-bottom: 0;
+        color: #17191d;
+        font-size: 1.08rem;
+        font-weight: 750;
+        line-height: 1.4;
+        overflow-wrap: anywhere;
     }
 
-    .core-stock-dot {
+    /* Stock */
+
+    .core-home .core-stock {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+
+        margin-top: 10px;
+        margin-bottom: 0;
+
+        color: #626a74;
+        font-size: 0.76rem;
+    }
+
+    .core-home .core-stock-dot {
+        flex-shrink: 0;
         width: 7px;
         height: 7px;
         border-radius: 50%;
-        background: #6b8793;
+        background: #718b7a;
     }
 
-    .core-stock-out .core-stock-dot {
-        background: #8c929a;
+    .core-home .core-stock-out {
+        color: #777d86;
     }
 
-    .core-product-footer {
-        padding: 0 17px 17px;
+    .core-home .core-stock-out .core-stock-dot {
+        background: #a0a5ad;
     }
 
-    .core-detail-button {
+    /* Detail button */
+
+    .core-home .core-product-footer {
+        padding: 0 16px 16px;
+    }
+
+    .core-home .core-detail-button {
         display: flex;
         align-items: center;
         justify-content: center;
-        min-height: 43px;
+
         width: 100%;
+        min-height: 42px;
+        padding: 10px 12px;
+
         border: 1px solid #252930;
         border-radius: 8px;
+
         background: #252930;
         color: #fff;
-        font-size: .88rem;
-        font-weight: 650;
+
+        font-size: 0.86rem;
+        font-weight: 600;
         text-decoration: none;
-        transition: background .2s ease;
+
+        transition: background-color 0.2s ease;
     }
 
-    .core-detail-button:hover {
+    .core-home .core-detail-button:hover {
         background: #414751;
         color: #fff;
     }
 
-    .core-empty-state {
-        padding: 55px 20px;
-        border: 1px dashed #cdd2d9;
-        border-radius: 14px;
+    /* Empty product state */
+
+    .core-home .core-empty-state {
+        padding: 48px 20px;
+        border: 1px dashed #d1d5db;
+        border-radius: 12px;
         background: #f8f9fb;
         text-align: center;
     }
+
+    /* Responsive product cards */
+
+    @media (max-width: 575.98px) {
+        .core-home .core-product-image-wrap {
+            padding: 12px;
+        }
+
+        .core-home .core-product-image {
+            height: 145px;
+        }
+
+        .core-home .core-product-body {
+            padding: 12px;
+        }
+
+        .core-home .core-product-footer {
+            padding: 0 12px 12px;
+        }
+
+        .core-home .core-product-name {
+            font-size: 0.87rem;
+        }
+
+        .core-home .core-product-description {
+            font-size: 0.75rem;
+        }
+
+        .core-home .core-product-price {
+            font-size: 0.96rem;
+        }
+
+        .core-home .core-product-badge {
+            top: 7px;
+            left: 7px;
+            padding: 4px 6px;
+            font-size: 0.64rem;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .core-home .core-product-card,
+        .core-home .core-detail-button {
+            transition: none;
+        }
+}
+
 
     /* LOCATION */
     .core-location {
@@ -1014,9 +1107,29 @@
                             <circle cx="12" cy="10" r="2.5"/>
                         </svg>
                     </div>
-                    <p class="small text-white-50 mb-0">
-                        Informasi lokasi toko akan ditampilkan di sini.
-                    </p>
+                    <div class="text-start">
+                        <p class="small text-white-50 mb-2">
+                            <strong>Alamat Toko CORE</strong>
+                        </p>
+
+                        <p class="small text-white-50 mb-3">
+                            Jl. Margonda Raya No. 100, Pondok Cina,
+                            Kecamatan Beji, Kota Depok, Jawa Barat 16424
+                        </p>
+
+                        <p class="small text-white-50 mb-3">
+                            Jam operasional: Senin – Sabtu, 09.00 – 20.00 WIB
+                        </p>
+
+                        <a
+                            href="https://maps.app.goo.gl/CqyiLS13sY4DoE8XA"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="btn btn-light btn-sm">
+                            <i class="bi bi-geo-alt"></i>
+                            Petunjuk Arah
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
