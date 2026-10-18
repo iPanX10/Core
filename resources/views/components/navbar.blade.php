@@ -1,13 +1,17 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark core-navbar sticky-top">
     <div class="container">
-        {{-- Logo CORE --}}
-        <a class="navbar-brand fw-bold" href="{{ route('home') }}">
-            CORE
+
+        {{-- Brand CORE tanpa gambar logo --}}
+        <a
+            class="navbar-brand fw-bold core-brand"
+            href="{{ route('home') }}"
+        >
+            CORE<span class="core-brand-dot">.</span>
         </a>
 
         {{-- Tombol navigasi mobile --}}
         <button
-            class="navbar-toggler"
+            class="navbar-toggler core-toggler"
             type="button"
             data-bs-toggle="collapse"
             data-bs-target="#navbarCore"
@@ -20,46 +24,58 @@
 
         {{-- Menu navigasi --}}
         <div class="collapse navbar-collapse" id="navbarCore">
-            <ul class="navbar-nav ms-auto align-items-lg-center">
+            <ul class="navbar-nav ms-auto align-items-lg-center core-nav-list">
 
-                {{-- Home --}}
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ route('home') }}">
+                    <a
+                        class="nav-link {{ request()->routeIs('home') && !request()->has('section') ? 'active' : '' }}"
+                        href="{{ route('home') }}"
+                    >
                         Home
                     </a>
                 </li>
 
-                {{-- Produk --}}
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ route('home') }}#produk">
+                    <a
+                        class="nav-link"
+                        href="{{ route('home') }}#produk"
+                    >
                         Produk
                     </a>
                 </li>
 
-                {{-- Lokasi Toko --}}
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ route('home') }}#lokasi">
+                    <a
+                        class="nav-link"
+                        href="{{ route('home') }}#lokasi"
+                    >
                         Lokasi Toko
                     </a>
                 </li>
 
-                {{-- Kontak --}}
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ route('home') }}#kontak">
+                    <a
+                        class="nav-link"
+                        href="{{ route('home') }}#kontak"
+                    >
                         Kontak
                     </a>
                 </li>
 
-                {{-- Riwayat Pesanan --}}
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ route('orders.history') }}">
+                    <a
+                        class="nav-link {{ request()->routeIs('orders.history') ? 'active' : '' }}"
+                        href="{{ route('orders.history') }}"
+                    >
                         Riwayat Pesanan
                     </a>
                 </li>
 
-                {{-- Keranjang --}}
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ route('cart.index') }}">
+                    <a
+                        class="nav-link core-cart-link {{ request()->routeIs('cart.*') ? 'active' : '' }}"
+                        href="{{ route('cart.index') }}"
+                    >
                         Keranjang
                     </a>
                 </li>

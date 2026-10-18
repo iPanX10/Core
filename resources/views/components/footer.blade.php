@@ -1,4 +1,4 @@
-<footer class="bg-dark text-white py-4 mt-5" id="kontak">
+<footer class="bg-dark text-white py-4 mt-0" id="kontak">
     <div class="container text-center">
         <h5 class="fw-bold">CORE</h5>
 
