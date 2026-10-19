@@ -1,0 +1,29 @@
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+/* CORE Admin Dashboard */
+
+.fi-wi-stats-overview-stat {
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.fi-wi-stats-overview-stat:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+}
+
+.fi-wi-stats-overview-stat .fi-wi-stats-overview-stat-value {
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+.fi-wi-chart {
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.fi-wi {
+    min-width: 0;
+}

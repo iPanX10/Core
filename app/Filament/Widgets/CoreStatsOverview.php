@@ -9,6 +9,13 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class CoreStatsOverview extends StatsOverviewWidget
 {
+    protected ?string $heading = null;
+
+    protected function getColumns(): int
+    {
+        return 4;
+    }
+
     protected function getStats(): array
     {
         return [
