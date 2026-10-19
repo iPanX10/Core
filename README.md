@@ -1,142 +1,129 @@
+# CORE — Computer Hardware E-Commerce
 
-# CORE — Computer Hardware Store
+A web-based e-commerce application for computer hardware products, built with Laravel. CORE provides a streamlined shopping experience for browsing hardware components, managing shopping carts, placing orders, and tracking order status through an administrative dashboard.
 
-A web-based e-commerce application for browsing and purchasing computer hardware components, built with Laravel.
+**Repository:** [https://github.com/iPanX10/Core](https://github.com/iPanX10/Core)
 
-CORE provides a convenient shopping experience for customers looking for computer hardware, including processors, RAM, graphics cards, motherboards, and other PC components.
-
-## Table of Contents
-
-- [Overview](#overview)
-- [Features](#features)
-- [Technology Stack](#technology-stack)
-- [Requirements](#requirements)
-- [Installation](#installation)
-- [Running the Application](#running-the-application)
-- [Testing](#testing)
-- [Project Structure](#project-structure)
-- [Development Workflow](#development-workflow)
-- [Roadmap](#roadmap)
-- [Limitations](#limitations)
-- [Contributing](#contributing)
-- [License](#license)
+---
 
 ## Overview
 
-CORE is a computer hardware e-commerce project developed to provide an organized product catalog and a straightforward online shopping workflow.
+CORE is an e-commerce web application focused on computer hardware components, including RAM, CPUs, graphics cards, and motherboards. The project is designed to demonstrate a complete shopping workflow, from product discovery and checkout to order management and administrative operations.
 
-The application includes product discovery, category browsing, search and price sorting, shopping cart management, checkout, order creation, and order-related pages. It also includes an administrative panel for authorized users.
-
-The project focuses on practical Laravel development, database integration, validation, access control, and automated testing.
+The application includes a customer-facing storefront and an admin dashboard powered by Filament.
 
 ## Features
 
 ### Customer Features
 
-- **Product Catalog** — Browse available computer hardware products.
-- **Product Categories** — Explore products by category.
-- **Product Search** — Find products using search functionality.
-- **Product Sorting** — Sort products by price.
-- **Product Details** — View individual product information.
-- **Shopping Cart** — Add, update, and remove products.
-- **Discounted Pricing** — Calculate prices using active product discounts.
-- **Checkout** — Submit orders with delivery or store pickup options.
-- **Payment Simulation** — Display simulated payment options for bank transfer, QRIS, and e-wallet.
-- **Order Confirmation** — View order confirmation after a successful checkout.
-- **Order Invoice** — Access an invoice using the order number and access token.
-- **Order History Lookup** — Search for an order using the required order details.
+- **Product Catalog** — Browse computer hardware products and view product details.
+- **Search and Filtering** — Search products, filter by category, and sort by price.
+- **Shopping Cart** — Add products to the cart and manage product quantities.
+- **Checkout System** — Choose between store pickup and delivery.
+- **Payment Simulation** — Select simulated payment methods, including Virtual Account, QRIS, and e-wallets.
+- **Order History** — Access order information and track order status.
+- **Order Status Tracking** — Follow the order lifecycle based on the selected fulfillment method.
 
-### Administrative Features
+### Admin Features
 
-- **Admin Authentication** — Restrict access to authorized administrators.
-- **Role-Based Access** — Prevent regular users from accessing the admin panel.
-- **Product and Order Administration** — Administrative functionality depends on the features configured in the application.
+- **Administrative Dashboard** — Manage store operations through Filament.
+- **Product Management** — Manage product information, prices, stock, and discounts.
+- **Category Management** — Organize products by category.
+- **Order Management** — View and update customer orders.
+- **Payment Status Management** — Manage payment status with validation rules.
+- **Fulfillment Management** — Apply different order status transitions for pickup and delivery.
+- **Stock Management** — Restore product stock when an eligible order is cancelled.
+- **Order Validation** — Prevent invalid status transitions and unauthorized order reactivation.
 
 ## Technology Stack
 
 | Technology | Purpose |
 |---|---|
-| PHP | Backend programming language |
-| Laravel | Web application framework |
+| PHP 8.4 | Backend programming language |
+| Laravel 13 | Web application framework |
+| Blade | Server-rendered templates |
+| Bootstrap 5.3 | Frontend styling |
+| Filament 5 | Administrative dashboard |
 | MySQL | Relational database |
-| Blade | Server-side templating engine |
-| Bootstrap 5 | Responsive frontend styling |
-| JavaScript | Client-side interactions |
-| Filament | Administrative panel |
 | Composer | PHP dependency management |
-| Git and GitHub | Version control and collaboration |
+| Node.js & npm | Frontend asset tooling |
 | XAMPP | Local development environment |
 
-## Requirements
+## Order Workflow
 
-Ensure the following tools are installed before setting up CORE:
+CORE supports two fulfillment methods with different status transitions.
 
-- PHP version compatible with the project dependencies
+**Store Pickup**
+
+`Pending → Processing → Completed`
+
+**Delivery**
+
+`Pending → Processing → Shipped → Completed`
+
+Orders can also be cancelled when permitted by the application's validation rules. Paid orders require the appropriate refund process before cancellation.
+
+## Payment Methods
+
+The application currently provides simulated payment options:
+
+- Virtual Account / Bank Transfer
+- QRIS
+- E-Wallet
+
+**Note:** Payment processing is simulated. CORE does not currently represent a production-integrated payment gateway.
+
+## Installation and Setup
+
+### Prerequisites
+
+Ensure the following tools are installed:
+
+- PHP 8.4 or a compatible version supported by the project dependencies
 - Composer
-- MySQL or MariaDB
+- Node.js and npm
+- MySQL
 - Git
-- XAMPP or another compatible PHP and database environment
-- Node.js and npm, if required by the frontend build configuration
-
-Check the installed versions:
-
-```bash
-php -v
-composer --version
-node -v
-npm -v
-```
-
-The Node.js and npm commands are only necessary if the project uses frontend dependencies that require them.
-
-## Installation
-
-Follow these steps to run CORE on a local development machine.
 
 ### 1. Clone the Repository
 
-Replace the repository URL below with the actual URL of the CORE GitHub repository.
-
 ```bash
-git clone https://github.com/iPanX10/Core
-cd core
+git clone https://github.com/iPanX10/Core.git
+cd Core
 ```
-
-If Git creates a directory with a different name, navigate to that directory instead.
 
 ### 2. Install Dependencies
 
-Install the PHP dependencies:
-
 ```bash
 composer install
-```
-
-If the project requires frontend dependencies, install them as well:
-
-```bash
 npm install
 ```
 
-Only run the npm commands if the project includes the corresponding package configuration.
-
 ### 3. Configure Environment Variables
 
-Create a local environment file.
+Copy the example environment file:
 
-**Windows Command Prompt:**
-
-```bat
-copy .env.example .env
+```bash
+cp .env.example .env
 ```
 
-**PowerShell:**
+On Windows PowerShell, use:
 
 ```powershell
 Copy-Item .env.example .env
 ```
 
-Open `.env` and configure the application and database settings:
+Generate the application key:
+
+```bash
+php artisan key:generate
+```
+
+### 4. Configure the Database
+
+Create a MySQL database named `core`, or use another database name and update your `.env` configuration accordingly.
+
+Example configuration:
 
 ```env
 APP_NAME=CORE
@@ -152,201 +139,112 @@ DB_USERNAME=root
 DB_PASSWORD=
 ```
 
-Adjust the values according to your local environment.
+Adjust the database username and password to match your local MySQL configuration.
 
-Do not commit `.env` or other files containing credentials and secrets to GitHub.
-
-### 4. Generate the Application Key
-
-```bash
-php artisan key:generate
-```
-
-### 5. Create the Database
-
-1. Start MySQL through XAMPP or your preferred database service.
-2. Open phpMyAdmin or another database management tool.
-3. Create a database named `core`.
-4. Ensure the database settings in `.env` match your configuration.
-
-### 6. Run Database Migrations
+### 5. Run Database Migrations
 
 ```bash
 php artisan migrate
 ```
 
-This command creates the database tables defined by the project's migrations.
+If the repository includes database seeders for sample categories, products, or administrator accounts, run the appropriate seeders after reviewing their configuration.
 
-If you also need the sample data provided by the project's seeders, inspect the seeders first and then run:
+### 6. Build Frontend Assets
 
 ```bash
-php artisan db:seed
+npm run build
 ```
 
-Some seeders may create sample products or initial accounts. Review their behavior before running them, especially when using a database that already contains data.
+For frontend development with automatic asset rebuilding:
+
+```bash
+npm run dev
+```
 
 ### 7. Start the Application
-
-Run the Laravel development server:
 
 ```bash
 php artisan serve
 ```
 
-Open the URL displayed in the terminal, usually:
+Open the application in your browser:
 
-http://127.0.0.1:8000
+- **Storefront:** [http://127.0.0.1:8000](http://127.0.0.1:8000)
+- **Admin Dashboard:** [http://127.0.0.1:8000/admin](http://127.0.0.1:8000/admin)
 
-## Running the Application
-
-After the installation is complete:
-
-1. Ensure the MySQL service is running.
-2. Confirm the database connection in `.env`.
-3. Start the Laravel development server using `php artisan serve`.
-4. Open the application in your browser.
-5. Browse products, manage the shopping cart, and test the checkout workflow.
-
-### Administrative Panel
-
-The administrative panel is configured at:
-
-http://127.0.0.1:8000/admin
-
-Access is restricted according to the application's authentication and authorization rules.
-
-Use an administrator account that has been created through the project's approved setup process. Do not assume that a default administrator account exists.
-
-## Testing
-
-CORE includes automated tests for selected application features.
-
-Run the complete test suite:
-
-```bash
-php artisan test
-```
-
-### Latest Recorded Test Results
-
-The latest reported test run completed with:
-
-- **13 tests passed**
-- **42 assertions**
-- **0 failed tests**
-
-The test suite covers basic application behavior, administrative access control, and selected shopping cart and checkout scenarios.
-
-These results describe the recorded test run, not a guarantee that every application feature is free of defects. Run the tests again after making code changes.
+The administrator account must be created or seeded according to the project's existing authentication configuration.
 
 ## Project Structure
 
-The following is a simplified overview of the Laravel project structure:
-
 ```text
-CORE/
+Core/
 ├── app/
-│   ├── Filament/
-│   ├── Http/
-│   │   └── Controllers/
-│   ├── Models/
-│   └── Providers/
+│   ├── Filament/       # Admin resources, pages, forms, and tables
+│   ├── Http/           # Controllers and request handling
+│   └── Models/         # Eloquent models
 ├── database/
-│   ├── factories/
-│   ├── migrations/
-│   └── seeders/
-├── public/
-│   ├── css/
-│   ├── js/
-│   └── images/
+│   ├── migrations/     # Database schema
+│   └── seeders/        # Initial or sample data
 ├── resources/
-│   └── views/
+│   └── views/          # Blade templates
 ├── routes/
-│   └── web.php
-├── tests/
-│   ├── Feature/
-│   └── Unit/
-├── .env.example
-├── artisan
-├── composer.json
-├── phpunit.xml
-└── README.md
+│   └── web.php         # Web routes
+├── public/             # Public assets
+├── .env.example        # Environment configuration template
+├── composer.json       # PHP dependencies
+└── package.json        # Frontend dependencies
 ```
 
-This structure is illustrative. The actual directories and files may differ depending on the current project configuration.
+## Business Rules and Data Integrity
 
-## Development Workflow
+CORE implements validation rules to protect order and inventory data:
 
-Contributors are encouraged to use separate branches for their changes.
+- Order status transitions depend on the selected fulfillment method.
+- Store pickup orders do not use the `Shipped` status.
+- Completed and cancelled orders cannot be reactivated through the normal status workflow.
+- Paid orders cannot be marked unpaid.
+- Cancellation of paid orders requires the appropriate refund process.
+- Stock restoration is performed when an eligible order is cancelled, while preventing duplicate restoration.
 
-### Create a Feature Branch
+These rules are enforced through the application's order management logic and administrative validation.
 
-```bash
-git checkout -b feature/your-feature
-```
+## Development Status
 
-### Make and Test Changes
+CORE is an ongoing development project. The current implementation focuses on the core e-commerce workflow, including product browsing, cart management, checkout, simulated payments, and order administration.
 
-Implement the changes and run the automated test suite:
+Further development may include production payment gateway integration, additional security hardening, automated testing, and improvements to the customer and administrator experience.
 
-```bash
-php artisan test
-```
+## Future Improvements
 
-### Commit and Push
-
-```bash
-git add .
-git commit -m "feat: describe your changes"
-git push origin feature/your-feature
-```
-
-Open a pull request on GitHub if the repository uses pull requests for review.
-
-Before committing, check that `.env`, credentials, private keys, and other sensitive files are not included.
-
-## Roadmap
-
-Potential future improvements include:
-
-- [ ] Integrate a real payment gateway.
-- [ ] Implement payment verification using a trusted payment provider.
-- [ ] Expand automated test coverage for the complete shopping workflow.
-- [ ] Improve order status tracking and administrative workflows.
-- [ ] Add project screenshots and additional documentation.
-- [ ] Prepare and validate a production deployment configuration.
-
-The roadmap should be updated as features are completed or project priorities change.
-
-## Limitations
-
-- **Simulated Payments:** Payment methods currently represent a simulation and are not proof of a real payment transaction.
-- **Payment Verification:** Real payment gateway callbacks, transaction verification, and reconciliation require an actual payment integration.
-- **Development Environment:** The installation instructions are intended for local development, not a production deployment.
-- **Test Coverage:** Automated tests cover selected scenarios and do not guarantee the absence of all defects.
-
-Do not use simulated payment details to make real financial transactions.
+- Integrate a real payment gateway.
+- Improve automated testing coverage.
+- Enhance order notifications.
+- Strengthen customer authentication and account management.
+- Improve reporting and sales analytics.
+- Optimize performance and production deployment configuration.
 
 ## Contributing
 
-Suggestions, bug reports, and improvements are welcome.
+Contributions, suggestions, and feedback are welcome.
 
-To contribute:
+1. Fork the repository.
+2. Create a feature branch.
+3. Commit your changes.
+4. Push your branch.
+5. Open a pull request describing your changes.
 
-1. Fork or clone the repository, depending on the repository permissions.
-2. Create a separate branch for your changes.
-3. Implement and test your changes.
-4. Commit your changes with a descriptive message.
-5. Submit a pull request if the repository workflow supports it.
+Please ensure that your changes are tested before submitting a pull request.
 
-## License
+## Disclaimer
 
-No open-source license has been specified in this repository.
+CORE is a development project intended for learning and demonstration purposes. Payment methods and payment status workflows are simulated and should not be considered production-ready financial processing.
 
-Unless a license is added, permission to reuse, modify, or redistribute the project should not be assumed.
+## Author
+
+**iPanX10**
+
+GitHub: [@iPanX10](https://github.com/iPanX10)
 
 ---
 
-**CORE — Computer Hardware Store**
-
-*Built with Laravel, MySQL, and a passion for technology.*
+*CORE — Computer Hardware E-Commerce*
