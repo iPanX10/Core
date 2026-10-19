@@ -20,21 +20,20 @@ class OrdersTable
                     ->copyable()
                     ->copyMessage('Nomor pesanan berhasil disalin')
                     ->weight(FontWeight::SemiBold)
-                    ->color('primary'),
+                    ->color('primary')
+                    ->description('Klik ikon salin untuk menyalin nomor'),
 
                 TextColumn::make('customer_name')
                     ->label('Pelanggan')
                     ->searchable()
                     ->sortable()
-                    ->weight(FontWeight::Medium),
-
-                TextColumn::make('whatsapp')
-                    ->label('WhatsApp')
-                    ->searchable()
-                    ->toggleable(),
+                    ->weight(FontWeight::Medium)
+                    ->description(fn ($record): ?string =>
+                        $record->whatsapp ?: null
+                    ),
 
                 TextColumn::make('fulfillment_method')
-                    ->label('Penerimaan')
+                    ->label('Metode Penerimaan')
                     ->formatStateUsing(fn (?string $state): string => match ($state) {
                         'delivery' => 'Pengiriman',
                         'pickup' => 'Ambil di Toko',
@@ -45,7 +44,7 @@ class OrdersTable
                     ->sortable(),
 
                 TextColumn::make('payment_method')
-                    ->label('Pembayaran')
+                    ->label('Metode Pembayaran')
                     ->formatStateUsing(fn (?string $state): string => match ($state) {
                         'bank_transfer' => 'Transfer Bank / VA',
                         'qris' => 'QRIS',
@@ -73,13 +72,6 @@ class OrdersTable
                     ->color('gray')
                     ->toggleable(),
 
-                TextColumn::make('payment_account_number')
-                    ->label('Nomor Pembayaran')
-                    ->searchable()
-                    ->copyable()
-                    ->placeholder('Belum tersedia')
-                    ->toggleable(isToggledHiddenByDefault: true),
-
                 TextColumn::make('status')
                     ->label('Status Pesanan')
                     ->formatStateUsing(fn (?string $state): string => match ($state) {
@@ -102,7 +94,7 @@ class OrdersTable
                     ->sortable(),
 
                 TextColumn::make('payment_status')
-                    ->label('Pembayaran')
+                    ->label('Status Pembayaran')
                     ->formatStateUsing(fn (?string $state): string => match ($state) {
                         'unpaid' => 'Belum Dibayar',
                         'paid' => 'Sudah Dibayar',
@@ -117,15 +109,29 @@ class OrdersTable
                     ->sortable(),
 
                 TextColumn::make('total')
-                    ->label('Total')
+                    ->label('Total Pesanan')
                     ->money('IDR', locale: 'id')
                     ->weight(FontWeight::SemiBold)
                     ->sortable(),
 
                 TextColumn::make('created_at')
-                    ->label('Tanggal')
+                    ->label('Tanggal Pesanan')
                     ->dateTime('d M Y, H:i')
                     ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('whatsapp')
+                    ->label('Nomor WhatsApp')
+                    ->searchable()
+                    ->copyable()
+                    ->copyMessage('Nomor WhatsApp berhasil disalin')
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('payment_account_number')
+                    ->label('Nomor Pembayaran Simulasi')
+                    ->searchable()
+                    ->copyable()
+                    ->placeholder('Belum tersedia')
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
