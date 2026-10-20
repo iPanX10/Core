@@ -415,6 +415,9 @@ These items are potential improvements and are not necessarily part of the curre
 
 **GitHub:** [https://github.com/iPanX10/Core](https://github.com/iPanX10/Core)
 
+## Instagram
+
+**Instagram:** [https://www.instagram.com/dwi_van/]
 ---
 
 <p align="center">
